@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Ledgerly - invoice tracking dashboard" />
+    <title>Ledgerly | Invoices</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f3d3e'/%3E%3Cpath d='M9 22V10h4v8h10v4z' fill='%23f2b84b'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="app">
+      <aside class="sidebar" id="sidebar" aria-label="Primary">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>Ledgerly
+        </div>
+        <nav>
+          <ul class="nav-list">
+            <li>
+              <button
+                class="nav-item is-active"
+                data-view="all"
+                data-title="Overview"
+              >
+                <i data-icon="grid"></i>Overview
+              </button>
+            </li>
+            <li>
+              <button
+                class="nav-item"
+                data-view="Pending"
+                data-title="Pending invoices"
+              >
+                <i data-icon="clock"></i>Pending
+              </button>
+            </li>
+            <li>
+              <button
+                class="nav-item"
+                data-view="Overdue"
+                data-title="Overdue invoices"
+              >
+                <i data-icon="alert"></i>Overdue
+              </button>
+            </li>
+            <li>
+              <button
+                class="nav-item"
+                data-view="Paid"
+                data-title="Paid invoices"
+              >
+                <i data-icon="check"></i>Paid
+              </button>
+            </li>
+          </ul>
+        </nav>
+        <p class="sidebar-note">Demo data is saved in this browser only.</p>
+      </aside>
+      <div class="scrim" id="scrim" hidden></div>
+
+      <div class="content">
+        <header class="topbar">
+          <button
+            class="icon-btn menu-btn"
+            id="menuBtn"
+            aria-label="Open navigation"
+            aria-controls="sidebar"
+            aria-expanded="false"
+          >
+            <i data-icon="menu"></i>
+          </button>
+          <h1 class="page-title" id="pageTitle">Overview</h1>
+          <label class="search"
+            ><span class="sr-only">Search invoices</span
+            ><i data-icon="search"></i>
+            <input
+              type="search"
+              id="searchInput"
+              placeholder="Search client or invoice number"
+              autocomplete="off"
+            />
+          </label>
+          <div class="dropdown" id="notifDropdown">
+            <button
+              class="icon-btn"
+              data-dropdown-toggle
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-label="Notifications"
+            >
+              <i data-icon="bell"></i><span class="dot" id="notifDot"></span>
+            </button>
+            <div class="dropdown-menu" role="menu" hidden>
+              <p class="menu-heading">Notifications</p>
+              <ul id="notifList" class="notif-list"></ul>
+            </div>
+          </div>
+          <div class="dropdown" id="profileDropdown">
+            <button
+              class="profile-btn"
+              data-dropdown-toggle
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              <span class="avatar" aria-hidden="true">PS</span
+              ><span class="profile-name">Priya S.</span
+              ><i data-icon="chevron"></i>
+            </button>
+            <div class="dropdown-menu" role="menu" hidden>
+              <button class="menu-item" role="menuitem" id="exportBtn">
+                <i data-icon="download"></i>Export CSV
+              </button>
+              <button class="menu-item" role="menuitem" id="resetBtn">
+                <i data-icon="refresh"></i>Reset demo data
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <main id="main" class="main">
+          <section
+            class="cards"
+            id="summaryCards"
+            aria-label="Summary"
+          ></section>
+
+          <section class="panel" aria-labelledby="tableHeading">
+            <div class="panel-head">
+              <h2 id="tableHeading">Invoices</h2>
+              <div class="toolbar">
+                <label class="field-inline"
+                  ><span class="sr-only">Filter by status</span>
+                  <select id="statusFilter">
+                    <option value="all">All statuses</option>
+                    <option>Paid</option>
+                    <option>Pending</option>
+                    <option>Overdue</option>
+                  </select>
+                </label>
+                <label class="field-inline"
+                  ><span class="sr-only">Sort by</span>
+                  <select id="sortSelect">
+                    <option value="due-asc">Due date: soonest</option>
+                    <option value="due-desc">Due date: latest</option>
+                    <option value="amount-desc">Amount: high to low</option>
+                    <option value="amount-asc">Amount: low to high</option>
+                    <option value="client-asc">Client: A to Z</option>
+                  </select>
+                </label>
+                <button class="btn btn-primary" id="addBtn">
+                  <i data-icon="plus"></i>New invoice
+                </button>
+              </div>
+            </div>
+            <div class="table-wrap" id="tableWrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">
+                      <button class="sort-btn" data-sort="number">
+                        Invoice
+                      </button>
+                    </th>
+                    <th scope="col">
+                      <button class="sort-btn" data-sort="client">
+                        Client
+                      </button>
+                    </th>
+                    <th scope="col">
+                      <button class="sort-btn" data-sort="amount">
+                        Amount
+                      </button>
+                    </th>
+                    <th scope="col">
+                      <button class="sort-btn" data-sort="due">Due</button>
+                    </th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="col-actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+              </table>
+            </div>
+            <div class="empty" id="emptyState" hidden>
+              <i data-icon="inbox"></i>
+              <h3>No invoices found</h3>
+              <p>Try a different search or filter, or create a new invoice.</p>
+              <button class="btn btn-ghost" id="clearBtn">Clear filters</button>
+            </div>
+            <div class="loading" id="loadingState" aria-live="polite">
+              <span class="spinner" aria-hidden="true"></span>Loading invoices
+            </div>
+          </section>
+        </main>
+        <footer class="footer">
+          <span>&copy; <span id="year"></span> Ledgerly. Demo project.</span
+          ><span id="countLabel"></span>
+        </footer>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="formModal" hidden>
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="formTitle"
+      >
+        <div class="modal-head">
+          <h2 id="formTitle">New invoice</h2>
+          <button class="icon-btn" data-close aria-label="Close">
+            <i data-icon="x"></i>
+          </button>
+        </div>
+        <form id="invoiceForm" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="fClient">Client name</label
+              ><input
+                id="fClient"
+                name="client"
+                type="text"
+                maxlength="60"
+                required
+              />
+              <p class="error" id="eClient" role="alert"></p>
+            </div>
+            <div class="field">
+              <label for="fEmail">Client email</label
+              ><input id="fEmail" name="email" type="email" required />
+              <p class="error" id="eEmail" role="alert"></p>
+            </div>
+            <div class="field">
+              <label for="fAmount">Amount (USD)</label
+              ><input
+                id="fAmount"
+                name="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                required
+              />
+              <p class="error" id="eAmount" role="alert"></p>
+            </div>
+            <div class="field">
+              <label for="fDue">Due date</label
+              ><input id="fDue" name="due" type="date" required />
+              <p class="error" id="eDue" role="alert"></p>
+            </div>
+            <div class="field full">
+              <label for="fStatus">Status</label
+              ><select id="fStatus" name="status">
+                <option>Pending</option>
+                <option>Paid</option>
+                <option>Overdue</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="fNotes">Notes (optional)</label
+              ><textarea
+                id="fNotes"
+                name="notes"
+                rows="3"
+                maxlength="200"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-foot">
+            <button type="button" class="btn btn-ghost" data-close>
+              Cancel</button
+            ><button type="submit" class="btn btn-primary" id="saveBtn">
+              Save invoice
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="viewModal" hidden>
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="viewTitle"
+      >
+        <div class="modal-head">
+          <h2 id="viewTitle">Invoice</h2>
+          <button class="icon-btn" data-close aria-label="Close">
+            <i data-icon="x"></i>
+          </button>
+        </div>
+        <dl class="details" id="viewBody"></dl>
+        <div class="modal-foot">
+          <button class="btn btn-ghost" data-close>Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="confirmModal" hidden>
+      <div
+        class="modal modal-sm"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="confirmTitle"
+        aria-describedby="confirmText"
+      >
+        <div class="modal-head"><h2 id="confirmTitle">Delete invoice?</h2></div>
+        <p id="confirmText" class="confirm-text"></p>
+        <div class="modal-foot">
+          <button class="btn btn-ghost" data-close>Cancel</button
+          ><button class="btn btn-danger" id="confirmDelete">
+            Delete invoice
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+    <script src="./script.js"></script>
+  </body>
+</html>
